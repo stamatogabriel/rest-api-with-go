@@ -1,16 +1,19 @@
 package db
 
 import (
+	"context"
+	"log"
+	"os"
+
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"os"
 )
 
 var collection *mongo.Collection
 
 func ConnectToMongoDB() (*mongo.Client, error) {
 	// MongoDB connection string
-	clientOptions := options.Client().ApplyURI("mongodb://mongo:27017")
+	clientOptions := options.Client().ApplyURI("mongodb://localhost:27017")
 
 	// Set up authentication using environment variables
 	username := os.Getenv("MONGO_DB_USERNAME")
@@ -22,7 +25,7 @@ func ConnectToMongoDB() (*mongo.Client, error) {
 		Password: password,
 	})
 
-	client, err := mongo.Connect(nil, clientOptions)
+	client, err := mongo.Connect(context.Background(), clientOptions)
 	if err != nil {
 		log.Fatalf("Failed to connect to MongoDB: %v", err)
 		return nil, err
