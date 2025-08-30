@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"backend/middlewares"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
 )
@@ -26,12 +28,17 @@ func CreateRouter() chi.Router {
 		r.Route("/v1", func(r chi.Router) {
 			r.Get("/health", healthCheckHandler)
 
-			/**	TODO Handlers */
+			// Public routes (sem autenticação)
 			r.Get("/todos", getTodosHandler)
 			r.Get("/todos/{id}", getTodoByIDHandler)
-			r.Post("/todos/create", createTodoHandler)
-			r.Put("/todos/update/{id}", updateTodoHandler)
-			r.Delete("/todos/delete/{id}", deleteTodoHandler)
+
+			// Protected routes (com autenticação)
+			r.Group(func(r chi.Router) {
+				r.Use(middlewares.AuthenticationMiddleware)
+				r.Post("/todos/create", createTodoHandler)
+				r.Put("/todos/update/{id}", updateTodoHandler)
+				r.Delete("/todos/delete/{id}", deleteTodoHandler)
+			})
 		})
 	})
 
